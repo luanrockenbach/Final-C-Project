@@ -1,30 +1,36 @@
+/*Created by Luan Rockenbach, Maicon Dickow*/
+
 #include<stdio.h>
 #include <stdlib.h>
-#include<locale.h>
 #include<math.h>
+#include<conio.h>
 
 int main()
 {
-	setlocale(LC_ALL, "Portuguese");
+	FILE *archive;
+	archive = fopen("calculations.txt","w");
+	if(archive==NULL)
+	{
+		printf("\n\n\n -- ERRO, TENTE NOVAMENTE");
+		exit(1);
+	}
 	
-	float resistence, rms, frequence, simulationTime=1, peakVoltage, rmsCurrent, peakCurrent;
-	float degree[3] = {0, -120, 120};
+	float resistence, rms, frequence, simulationTime=1, peakVoltage, rmsCurrent, peakCurrent, controll = 0;
+	float radius[3] = {0, -2.0944, 2.0944};
 	
 	//Inputs setup
-	printf("\n\n -Digite o valor das resistências: ");
+	printf("\n\n -Digite o valor das resistencias: ");
 	scanf("%f", &resistence);
 
-	printf("\n\n -Digite o valor da Tensão Eficaz (RMS): ");
+	printf("\n\n -Digite o valor da Tensao Eficaz (RMS): ");
 	scanf("%f", &rms);
 
-	printf("\n\n -Digite a frequência: ");
+	printf("\n\n -Digite a frequencia: ");
 	scanf("%f", &frequence);
 
-	printf("\n\n -Digite o Tempo de simulação em mili-segundos(ms): ");
+	printf("\n\n -Digite o Tempo de simulacao em segundos(S): ");
 	scanf("%f", &simulationTime);
 	//End of inputs
-	
-	float resistenceCurrent[(int)simulationTime*100000], resistenceVoltage[(int)simulationTime*100000];
 	
 	peakVoltage = rms * sqrt(2);
 	rmsCurrent = rms/resistence;
@@ -32,12 +38,20 @@ int main()
 	
 	printf("pV: %f				pC: %f				rmsC: %f", peakVoltage, peakCurrent, rmsCurrent);
 	
-	for(int j=0;j<simulationTime*100000;j++)
+	fprintf(archive, "time  I1  I2  I3  V1  V2  V3");
+	while(controll <= simulationTime)
 	{
-	resistenceCurrent[j] = peakCurrent*sin(((2*3,14159265359)*frequence*j)+degree[2]);
-	resistenceVoltage[j] = peakVoltage*sin(((2*3,14159265359)*frequence*j)+degree[2]);
-	
-	printf("\n\n -- Corrente de cada resistor: %f Tensão de cada resistor: %f", resistenceCurrent[j], resistenceVoltage[j]);
-	}	
+		
+		fprintf(archive, "\n%f  %f  %f  %f  %f  %f  %f", controll, 
+		peakCurrent*sin((((2*3.14159265359)*frequence)*controll)+radius[0]), 
+		peakCurrent*sin((((2*3.14159265359)*frequence)*controll)+radius[1]), 
+		peakCurrent*sin((((2*3.14159265359)*frequence)*controll)+radius[2]), 
+		peakVoltage*sin((((2*3.14159265359)*frequence)*controll)+radius[0]), 
+		peakVoltage*sin((((2*3.14159265359)*frequence)*controll)+radius[1]), 
+		peakVoltage*sin((((2*3.14159265359)*frequence)*controll)+radius[2]));
+		
+		controll += ((1/frequence)/360)/10;
+	}
+
 	return 0;
 }
